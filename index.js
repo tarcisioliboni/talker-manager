@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { readFileSync } = require('fs');
 const { readFile } = require('fs').promises;
+const { randomBytes } = require('crypto');
 
 const app = express();
 app.use(bodyParser.json());
@@ -22,6 +23,11 @@ app.get('/talker/:id', async (req, res) => {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   res.status(200).json(talker);
+});
+
+app.post('/login', (_req, res) => {
+  const token = randomBytes(8).toString('hex');
+  res.status(200).json({ token });
 });
 
 // não remova esse endpoint, e para o avaliador funcionar
