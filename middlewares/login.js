@@ -1,4 +1,4 @@
-const login = (req, res) => {
+const login = (req, res, next) => {
   const emailRegex = /\S+@\S+\.\S+/;
   const { email, password } = req.body;
   if (!email) { 
@@ -16,6 +16,7 @@ const login = (req, res) => {
     return res
     .status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
   }
+next();
 };
 
 module.exports = login;
