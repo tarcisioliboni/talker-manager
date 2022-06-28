@@ -1,4 +1,4 @@
-const login = (req, res, next) => {
+const loginMiddleware = (req, res, next) => {
   const emailRegex = /\S+@\S+\.\S+/;
   const { email, password } = req.body;
   if (!email) { 
@@ -19,4 +19,4 @@ const login = (req, res, next) => {
 next();
 };
 
-module.exports = login;
+module.exports = loginMiddleware;

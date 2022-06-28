@@ -3,7 +3,15 @@ const bodyParser = require('body-parser');
 const { readFileSync } = require('fs');
 const { readFile } = require('fs').promises;
 const { randomBytes } = require('crypto');
-const login = require('./middlewares/login');
+const functionWriteFile = require('./services/functionWriteFile');
+const functionReadFile = require('./services/functionReadFile');
+const loginMiddleware = require('./middlewares/login-middleware');
+const ageMiddleware = require('./middlewares/age-middleware');
+const authorizationMiddleware = require('./middlewares/authorization-middleware');
+const nameMiddleware = require('./middlewares/name-middleware');
+const rateMiddleware = require('./middlewares/rate-middleware');
+const talkMiddleware = require('./middlewares/talk-middleware');
+const watchedAtMiddleware = require('./middlewares/watchedAt-middleware');
 
 const app = express();
 app.use(bodyParser.json());
@@ -26,10 +34,25 @@ app.get('/talker/:id', async (req, res) => {
   res.status(200).json(talker);
 });
 
-app.post('/login', login, (_req, res) => {
+app.post('/login', loginMiddleware, (_req, res) => {
   const token = randomBytes(8).toString('hex');
   res.status(200).json({ token });
 });
+
+app.post('/talker', authorizationMiddleware, nameMiddleware, ageMiddleware,
+  talkMiddleware, watchedAtMiddleware, rateMiddleware,
+  async (req, res) => {
+    const { name, age, talk } = req.body;
+    try {
+      const talkers = await functionReadFile();
+      const newTalkers = { id: talkers.length + 1, name, age, talk };
+      talkers.push(newTalkers);
+      functionWriteFile(talkers);
+      return res.status(201).json(newTalkers);
+    } catch (error) {
+      return res.status(400).json({ message: error });
+    }
+  });
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
