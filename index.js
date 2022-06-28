@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const { readFileSync } = require('fs');
 const { readFile } = require('fs').promises;
 const { randomBytes } = require('crypto');
+const login = require('./middlewares/login');
 
 const app = express();
 app.use(bodyParser.json());
@@ -25,7 +26,7 @@ app.get('/talker/:id', async (req, res) => {
   res.status(200).json(talker);
 });
 
-app.post('/login', (_req, res) => {
+app.post('/login', login, (_req, res) => {
   const token = randomBytes(8).toString('hex');
   res.status(200).json({ token });
 });
