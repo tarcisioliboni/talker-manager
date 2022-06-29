@@ -54,6 +54,19 @@ app.post('/talker', authorizationMiddleware, nameMiddleware, ageMiddleware,
     }
   });
 
+app.put('/talker/:id', authorizationMiddleware, nameMiddleware, ageMiddleware,
+  talkMiddleware, watchedAtMiddleware, rateMiddleware,
+  async (req, res) => {
+    const { name, age, talk } = req.body;
+    let { id } = req.params;
+    id = Number(id);
+    const talkers = JSON.parse(await readFile('./talker.json', 'utf8'));
+    const newTalker = talkers.map((person) =>
+      (person.id === id ? { id, name, age, talk } : person));
+    functionWriteFile(newTalker);
+    return res.status(200).json({ id, name, age, talk });
+  });
+
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
